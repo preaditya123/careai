@@ -40,6 +40,7 @@
     --report-color: 269 97% 85%;
     --emergency-color: 0 91% 71%;
     --prediction-color: 199 89% 48%;
+    --journal-color: 35 91% 65%;
   }
 }
 
@@ -56,7 +57,7 @@
 
 @layer components {
   .feature-card {
-    @apply relative flex flex-col items-center justify-center p-8 rounded-xl bg-card text-card-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 border border-border/50;
+    @apply relative flex flex-col items-center justify-center p-8 rounded-xl bg-card text-card-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 border border-border/50 hover:border-primary/50 hover:scale-[1.02];
   }
 
   .feature-icon {
@@ -68,6 +69,36 @@
   }
 
   .page-header {
-    @apply text-3xl font-bold mb-8 text-center;
+    @apply text-3xl font-bold mb-8 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
   }
+}
+
+/* Journal specific styles */
+.journal-entry {
+  @apply rounded-md p-4 mb-4 border border-border transition-all hover:border-primary/50;
+}
+
+.mood-happy {
+  @apply text-chat;
+}
+
+.mood-sad {
+  @apply text-report;
+}
+
+.mood-angry {
+  @apply text-emergency;
+}
+
+/* Enhanced scrollbar */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted/50 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/50 rounded-full hover:bg-primary;
 }

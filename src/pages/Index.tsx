@@ -1,22 +1,22 @@
 
 import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
-import { MessageCircle, FileText, Ambulance, Stethoscope } from "lucide-react";
+import { MessageCircle, FileText, Ambulance, Stethoscope, CalendarCheck } from "lucide-react";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="page-container py-12">
-        <h1 className="text-4xl font-bold text-center mb-2">
+        <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
           Welcome to Care AI
         </h1>
         <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
           Your comprehensive healthcare companion providing personalized health assistance, 
-          medical report analysis, emergency services, and health predictions.
+          medical report analysis, emergency services, health predictions, and personal health journaling.
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
           {/* Chat with Care AI */}
           <FeatureCard
             title="Chat with Care AI"
@@ -47,10 +47,19 @@ const Index = () => {
           {/* Disease Prediction */}
           <FeatureCard
             title="Disease Prediction"
-            description="Advanced AI-powered disease prediction system using machine learning models. Input your symptoms and get instant health insights! Supports various conditions including Blood Pressure, Blood Sugar, and COVID-19 prediction."
+            description="Advanced AI-powered disease prediction system using machine learning models. Input your symptoms and get instant health insights!"
             icon={<Stethoscope className="w-8 h-8 text-prediction" />}
             iconColor="bg-prediction/20"
             to="/prediction"
+          />
+          
+          {/* Health Journal */}
+          <FeatureCard
+            title="Health Journal"
+            description="Track your health journey with daily journal entries. Record symptoms, moods, and progress to better understand your health patterns over time."
+            icon={<CalendarCheck className="w-8 h-8 text-journal" />}
+            iconColor="bg-journal/20"
+            to="/journal"
           />
         </div>
       </main>
