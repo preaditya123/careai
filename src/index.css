@@ -5,41 +5,41 @@
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
-    --card: 217 33% 17%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 210 40% 98%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 221 83% 53%;
+    --primary: 212 100% 47%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 199 89% 48%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 183 74% 44%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 210 40% 93%;
+    --muted-foreground: 220 8% 46%;
 
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 183 74% 92%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 25%;
-    --input: 217 33% 25%;
-    --ring: 224 76% 48%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 212 100% 47%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
     /* Feature-specific colors */
-    --chat-color: 142 71% 45%;
-    --report-color: 269 97% 85%;
-    --emergency-color: 0 91% 71%;
-    --prediction-color: 199 89% 48%;
+    --chat-color: 212 100% 47%;
+    --report-color: 183 74% 44%;
+    --emergency-color: 0 84% 60%;
+    --prediction-color: 259 77% 64%;
     --journal-color: 35 91% 65%;
   }
 }
@@ -57,11 +57,13 @@
 
 @layer components {
   .feature-card {
-    @apply relative flex flex-col items-center justify-center p-8 rounded-xl bg-card text-card-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 border border-border/50 hover:border-primary/50 hover:scale-[1.02];
+    @apply relative flex flex-col items-center justify-center p-8 rounded-2xl bg-card text-card-foreground 
+           transition-all duration-300 hover:shadow-lg shadow-md
+           border border-border hover:border-primary/30 hover:scale-[1.02];
   }
 
   .feature-icon {
-    @apply w-14 h-14 mb-6 p-3 rounded-full flex items-center justify-center;
+    @apply w-16 h-16 mb-6 p-3 rounded-full flex items-center justify-center shadow-sm;
   }
 
   .page-container {
@@ -69,13 +71,17 @@
   }
 
   .page-header {
-    @apply text-3xl font-bold mb-8 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+    @apply text-3xl font-bold mb-2 text-foreground;
+  }
+  
+  .page-subheader {
+    @apply text-muted-foreground text-center mb-12 max-w-2xl mx-auto;
   }
 }
 
 /* Journal specific styles */
 .journal-entry {
-  @apply rounded-md p-4 mb-4 border border-border transition-all hover:border-primary/50;
+  @apply rounded-xl p-4 mb-4 border border-border/70 bg-white shadow-sm transition-all hover:shadow-md hover:border-primary/30;
 }
 
 .mood-happy {
@@ -101,4 +107,14 @@
 
 ::-webkit-scrollbar-thumb {
   @apply bg-primary/50 rounded-full hover:bg-primary;
+}
+
+/* Header styles */
+.main-header {
+  @apply bg-white border-b border-border/50 shadow-sm;
+}
+
+/* Hero section */
+.hero-section {
+  @apply bg-gradient-to-br from-primary/5 to-secondary/10 rounded-3xl p-10 mb-12 border border-border/50;
 }

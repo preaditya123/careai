@@ -57,6 +57,7 @@ export default {
 				report: 'hsl(var(--report-color))',
 				emergency: 'hsl(var(--emergency-color))',
 				prediction: 'hsl(var(--prediction-color))',
+				journal: 'hsl(var(--journal-color))',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -83,12 +84,17 @@ export default {
 				'pulse-gentle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.7' },
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-gentle': 'pulse-gentle 3s infinite',
+				'float': 'float 6s ease-in-out infinite',
 			}
 		}
 	},
