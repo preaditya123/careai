@@ -155,7 +155,7 @@ const Journal = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <style jsx global>{`
+              <style dangerouslySetInnerHTML={{ __html: `
                 .react-calendar {
                   width: 100%;
                   background: transparent;
@@ -196,7 +196,7 @@ const Journal = () => {
                 .entry-day-angry::after {
                   background-color: hsl(var(--emergency-color));
                 }
-              `}</style>
+              `}} />
               <Calendar 
                 onChange={setDate} 
                 value={date}
