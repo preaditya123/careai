@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import FeatureCard from "@/components/FeatureCard";
 import { MessageCircle, FileText, Ambulance, Stethoscope, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
