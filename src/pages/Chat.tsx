@@ -111,30 +111,8 @@ const ChatPage = () => {
     // Show upload toast notification
     toast({
       title: "File uploaded successfully",
-      description: `Analyzing ${file.name}...`,
+      description: `${file.name} added to queue`,
     });
-    
-    // Simulate processing
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      let content = "";
-      
-      if (file.type.includes('pdf')) {
-        content = `I've analyzed your PDF document "${file.name}". The document appears to contain medical information that suggests regular check-ups and proper medication management are important for your condition.`;
-      } else if (file.type.includes('image')) {
-        content = `I've analyzed your image "${file.name}". The image appears to show typical symptoms of a minor skin irritation. This is commonly treated with hydrocortisone cream, but please consult your doctor for a proper diagnosis.`;
-      } else {
-        content = `I've received your file "${file.name}" but can only analyze PDFs and images. Please upload a supported file format.`;
-      }
-      
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content },
-      ]);
-      
-      setIsLoading(false);
-    }, 2000);
     
     // Reset the input
     e.target.value = '';
@@ -155,6 +133,42 @@ const ChatPage = () => {
     else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
     else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
     else return (bytes / 1073741824).toFixed(1) + ' GB';
+  };
+
+  const analyzeFiles = () => {
+    // Only proceed if there are files to analyze
+    if (uploadedFiles.length === 0) {
+      toast({
+        title: "No files to analyze",
+        description: "Please upload at least one file first.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    // Simulate processing of all uploaded files
+    setTimeout(() => {
+      let content = "I've analyzed your uploaded files:";
+      
+      uploadedFiles.forEach(file => {
+        if (file.type.includes('pdf')) {
+          content += `\n\n• The PDF document "${file.name}" appears to contain medical information that suggests regular check-ups and proper medication management are important for your condition.`;
+        } else if (file.type.includes('image')) {
+          content += `\n\n• The image "${file.name}" shows typical symptoms of a minor skin irritation. This is commonly treated with hydrocortisone cream, but please consult your doctor for a proper diagnosis.`;
+        }
+      });
+      
+      content += "\n\nOverall assessment: Your documents indicate that you should maintain your current treatment plan while monitoring for any changes in symptoms. A follow-up appointment in 2-3 weeks is recommended.";
+      
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content },
+      ]);
+      
+      setIsLoading(false);
+    }, 2000);
   };
 
   return (
@@ -232,28 +246,15 @@ const ChatPage = () => {
                       </div>
                     )}
                     
-                    <div className="flex flex-col space-y-2">
+                    {uploadedFiles.length > 0 && (
                       <Button 
-                        variant="outline" 
-                        className="justify-start" 
-                        size="sm"
-                        onClick={triggerFileUpload}
-                        disabled={uploadedFiles.length >= MAX_FILES}
+                        onClick={analyzeFiles}
+                        className="w-full" 
+                        disabled={isLoading}
                       >
-                        <FileText className="mr-2 h-4 w-4 text-report" />
-                        <span>Upload PDF</span>
+                        Analyze Files
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        className="justify-start" 
-                        size="sm"
-                        onClick={triggerFileUpload}
-                        disabled={uploadedFiles.length >= MAX_FILES}
-                      >
-                        <FileImage className="mr-2 h-4 w-4 text-journal" />
-                        <span>Upload Image</span>
-                      </Button>
-                    </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

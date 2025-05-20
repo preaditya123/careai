@@ -5,7 +5,7 @@ import { FileText, Upload, AlertTriangle, CheckCircle, FileImage, X } from "luci
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AnalysisResult {
   summary: string;
@@ -30,6 +30,7 @@ const ReportAnalysisPage = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const validateFileUpload = (file: File): string | null => {
     if (file.size > MAX_FILE_SIZE) {
@@ -104,7 +105,14 @@ const ReportAnalysisPage = () => {
   };
 
   const handleAnalyze = () => {
-    if (uploadedFiles.length === 0) return;
+    if (uploadedFiles.length === 0) {
+      toast({
+        title: "No files to analyze",
+        description: "Please upload at least one file first.",
+        variant: "destructive"
+      });
+      return;
+    }
     
     setIsAnalyzing(true);
     
@@ -226,37 +234,14 @@ const ReportAnalysisPage = () => {
                       </div>
                     )}
                     
-                    <div className="flex flex-col space-y-2">
-                      <Button 
-                        variant="outline" 
-                        className="justify-start" 
-                        size="sm"
-                        onClick={triggerFileUpload}
-                        disabled={uploadedFiles.length >= MAX_FILES}
-                      >
-                        <FileText className="mr-2 h-4 w-4 text-report" />
-                        <span>Upload PDF</span>
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        className="justify-start" 
-                        size="sm"
-                        onClick={triggerFileUpload}
-                        disabled={uploadedFiles.length >= MAX_FILES}
-                      >
-                        <FileImage className="mr-2 h-4 w-4 text-journal" />
-                        <span>Upload Image</span>
-                      </Button>
-                    </div>
+                    <Button 
+                      onClick={handleAnalyze} 
+                      disabled={uploadedFiles.length === 0 || isAnalyzing}
+                      className="w-full"
+                    >
+                      {isAnalyzing ? "Analyzing..." : "Analyze Report"}
+                    </Button>
                   </div>
-                  
-                  <Button 
-                    onClick={handleAnalyze} 
-                    disabled={uploadedFiles.length === 0 || isAnalyzing}
-                    className="w-full mt-4"
-                  >
-                    {isAnalyzing ? "Analyzing..." : "Analyze Report"}
-                  </Button>
                 </CardContent>
               </Card>
             </div>
