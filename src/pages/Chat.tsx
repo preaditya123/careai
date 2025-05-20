@@ -1,16 +1,25 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle, Send, Bot, User, Upload, FileImage, FileText } from "lucide-react";
+import { MessageCircle, Send, Bot, User, Upload, FileImage, FileText, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
+
+interface FileInfo {
+  name: string;
+  type: string;
+  size: number;
+}
+
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+const MAX_FILES = 5;
 
 const ChatPage = () => {
   const [input, setInput] = useState("");
@@ -21,6 +30,8 @@ const ChatPage = () => {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<FileInfo[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
   const handleSendMessage = (e: React.FormEvent) => {
@@ -54,18 +65,53 @@ const ChatPage = () => {
     }, 1500);
   };
 
+  const validateFileUpload = (file: File): string | null => {
+    if (file.size > MAX_FILE_SIZE) {
+      return `File size exceeds the maximum limit of 100MB`;
+    }
+    
+    if (uploadedFiles.length >= MAX_FILES) {
+      return `You can only upload up to ${MAX_FILES} files`;
+    }
+    
+    const fileType = file.type;
+    if (!fileType.includes('pdf') && !fileType.includes('image')) {
+      return `Only PDF and image files are supported`;
+    }
+    
+    return null;
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     
     const file = files[0];
-    const fileType = file.type;
-    const fileName = file.name;
+    
+    // Validate file
+    const validationError = validateFileUpload(file);
+    if (validationError) {
+      toast({
+        title: "Upload Error",
+        description: validationError,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const fileInfo: FileInfo = {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    };
+    
+    // Add file to uploaded files
+    setUploadedFiles(prev => [...prev, fileInfo]);
     
     // Show upload toast notification
     toast({
       title: "File uploaded successfully",
-      description: `Analyzing ${fileName}...`,
+      description: `Analyzing ${file.name}...`,
     });
     
     // Simulate processing
@@ -74,12 +120,12 @@ const ChatPage = () => {
     setTimeout(() => {
       let content = "";
       
-      if (fileType.includes('pdf')) {
-        content = `I've analyzed your PDF document "${fileName}". The document appears to contain medical information that suggests regular check-ups and proper medication management are important for your condition.`;
-      } else if (fileType.includes('image')) {
-        content = `I've analyzed your image "${fileName}". The image appears to show typical symptoms of a minor skin irritation. This is commonly treated with hydrocortisone cream, but please consult your doctor for a proper diagnosis.`;
+      if (file.type.includes('pdf')) {
+        content = `I've analyzed your PDF document "${file.name}". The document appears to contain medical information that suggests regular check-ups and proper medication management are important for your condition.`;
+      } else if (file.type.includes('image')) {
+        content = `I've analyzed your image "${file.name}". The image appears to show typical symptoms of a minor skin irritation. This is commonly treated with hydrocortisone cream, but please consult your doctor for a proper diagnosis.`;
       } else {
-        content = `I've received your file "${fileName}" but can only analyze PDFs and images. Please upload a supported file format.`;
+        content = `I've received your file "${file.name}" but can only analyze PDFs and images. Please upload a supported file format.`;
       }
       
       setMessages((prev) => [
@@ -92,6 +138,23 @@ const ChatPage = () => {
     
     // Reset the input
     e.target.value = '';
+  };
+  
+  const handleRemoveFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+    else return (bytes / 1073741824).toFixed(1) + ' GB';
   };
 
   return (
@@ -112,10 +175,16 @@ const ChatPage = () => {
                   <h3 className="text-lg font-medium mb-4">Upload Documents</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Upload medical reports, test results, or images for instant analysis.
+                    <span className="block mt-1 text-xs">
+                      Max: 100MB per file, up to 5 files
+                    </span>
                   </p>
                   
                   <div className="space-y-4">
-                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer">
+                    <div 
+                      className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                      onClick={triggerFileUpload}
+                    >
                       <label htmlFor="file-upload" className="cursor-pointer">
                         <div className="flex flex-col items-center">
                           <Upload className="h-8 w-8 text-muted-foreground mb-2" />
@@ -123,6 +192,7 @@ const ChatPage = () => {
                           <span className="text-xs text-muted-foreground mt-1">PDF or Image</span>
                         </div>
                         <input 
+                          ref={fileInputRef}
                           id="file-upload" 
                           type="file" 
                           accept="image/*,.pdf" 
@@ -132,12 +202,54 @@ const ChatPage = () => {
                       </label>
                     </div>
                     
+                    {uploadedFiles.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Uploaded Files ({uploadedFiles.length}/{MAX_FILES})</h4>
+                        <div className="max-h-48 overflow-y-auto space-y-2">
+                          {uploadedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md text-xs">
+                              <div className="flex items-center gap-2 overflow-hidden">
+                                {file.type.includes('pdf') ? 
+                                  <FileText className="h-4 w-4 text-report flex-shrink-0" /> : 
+                                  <FileImage className="h-4 w-4 text-journal flex-shrink-0" />
+                                }
+                                <span className="truncate">{file.name}</span>
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  ({formatFileSize(file.size)})
+                                </span>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-5 w-5 p-0" 
+                                onClick={() => handleRemoveFile(index)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="flex flex-col space-y-2">
-                      <Button variant="outline" className="justify-start" size="sm">
+                      <Button 
+                        variant="outline" 
+                        className="justify-start" 
+                        size="sm"
+                        onClick={triggerFileUpload}
+                        disabled={uploadedFiles.length >= MAX_FILES}
+                      >
                         <FileText className="mr-2 h-4 w-4 text-report" />
                         <span>Upload PDF</span>
                       </Button>
-                      <Button variant="outline" className="justify-start" size="sm">
+                      <Button 
+                        variant="outline" 
+                        className="justify-start" 
+                        size="sm"
+                        onClick={triggerFileUpload}
+                        disabled={uploadedFiles.length >= MAX_FILES}
+                      >
                         <FileImage className="mr-2 h-4 w-4 text-journal" />
                         <span>Upload Image</span>
                       </Button>

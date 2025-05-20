@@ -1,7 +1,7 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Header from "@/components/Header";
-import { FileText, Upload, AlertTriangle, CheckCircle } from "lucide-react";
+import { FileText, Upload, AlertTriangle, CheckCircle, FileImage, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,20 +16,95 @@ interface AnalysisResult {
   recommendations: string[];
 }
 
+interface FileInfo {
+  name: string;
+  type: string;
+  size: number;
+}
+
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB in bytes
+const MAX_FILES = 5;
+
 const ReportAnalysisPage = () => {
-  const [file, setFile] = useState<File | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<FileInfo[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateFileUpload = (file: File): string | null => {
+    if (file.size > MAX_FILE_SIZE) {
+      return `File size exceeds the maximum limit of 100MB`;
+    }
+    
+    if (uploadedFiles.length >= MAX_FILES) {
+      return `You can only upload up to ${MAX_FILES} files`;
+    }
+    
+    const fileType = file.type;
+    if (!fileType.includes('pdf') && !fileType.includes('image')) {
+      return `Only PDF and image files are supported`;
+    }
+    
+    return null;
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setResult(null);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    const file = files[0];
+    
+    // Validate file
+    const validationError = validateFileUpload(file);
+    if (validationError) {
+      toast({
+        title: "Upload Error",
+        description: validationError,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const fileInfo: FileInfo = {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    };
+    
+    // Add file to uploaded files list
+    setUploadedFiles(prev => [...prev, fileInfo]);
+    
+    // Reset result if a new file is uploaded
+    setResult(null);
+    
+    // Reset the input
+    e.target.value = '';
+    
+    toast({
+      title: "File uploaded",
+      description: `${file.name} has been uploaded successfully.`,
+    });
+  };
+  
+  const handleRemoveFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+    else return (bytes / 1073741824).toFixed(1) + ' GB';
+  };
+
   const handleAnalyze = () => {
-    if (!file) return;
+    if (uploadedFiles.length === 0) return;
     
     setIsAnalyzing(true);
     
@@ -94,39 +169,25 @@ const ReportAnalysisPage = () => {
                   <h3 className="text-lg font-medium mb-4">Upload Documents</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Upload medical reports, test results, or images for instant analysis.
+                    <span className="block mt-1 text-xs">
+                      Max: 100MB per file, up to 5 files
+                    </span>
                   </p>
                   
                   <div className="space-y-4">
-                    <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer">
-                      <label htmlFor="file-upload" className="cursor-pointer">
+                    <div 
+                      className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+                      onClick={triggerFileUpload}
+                    >
+                      <label htmlFor="file-upload-report" className="cursor-pointer">
                         <div className="flex flex-col items-center">
                           <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                          {file ? (
-                            <div className="space-y-1">
-                              <span className="text-sm font-medium">{file.name}</span>
-                              <p className="text-xs text-muted-foreground">
-                                {(file.size / 1024).toFixed(0)} KB
-                              </p>
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  setFile(null);
-                                }}
-                              >
-                                Remove
-                              </Button>
-                            </div>
-                          ) : (
-                            <>
-                              <span className="text-sm font-medium">Upload File</span>
-                              <span className="text-xs text-muted-foreground mt-1">PDF or Image</span>
-                            </>
-                          )}
+                          <span className="text-sm font-medium">Upload File</span>
+                          <span className="text-xs text-muted-foreground mt-1">PDF or Image</span>
                         </div>
                         <input 
-                          id="file-upload" 
+                          ref={fileInputRef}
+                          id="file-upload-report" 
                           type="file" 
                           accept="image/*,.pdf" 
                           className="hidden" 
@@ -135,13 +196,55 @@ const ReportAnalysisPage = () => {
                       </label>
                     </div>
                     
+                    {uploadedFiles.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="text-sm font-medium">Uploaded Files ({uploadedFiles.length}/{MAX_FILES})</h4>
+                        <div className="max-h-48 overflow-y-auto space-y-2">
+                          {uploadedFiles.map((file, index) => (
+                            <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md text-xs">
+                              <div className="flex items-center gap-2 overflow-hidden">
+                                {file.type.includes('pdf') ? 
+                                  <FileText className="h-4 w-4 text-report flex-shrink-0" /> : 
+                                  <FileImage className="h-4 w-4 text-journal flex-shrink-0" />
+                                }
+                                <span className="truncate">{file.name}</span>
+                                <span className="text-muted-foreground flex-shrink-0">
+                                  ({formatFileSize(file.size)})
+                                </span>
+                              </div>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-5 w-5 p-0" 
+                                onClick={() => handleRemoveFile(index)}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="flex flex-col space-y-2">
-                      <Button variant="outline" className="justify-start" size="sm">
+                      <Button 
+                        variant="outline" 
+                        className="justify-start" 
+                        size="sm"
+                        onClick={triggerFileUpload}
+                        disabled={uploadedFiles.length >= MAX_FILES}
+                      >
                         <FileText className="mr-2 h-4 w-4 text-report" />
                         <span>Upload PDF</span>
                       </Button>
-                      <Button variant="outline" className="justify-start" size="sm">
-                        <Upload className="mr-2 h-4 w-4 text-journal" />
+                      <Button 
+                        variant="outline" 
+                        className="justify-start" 
+                        size="sm"
+                        onClick={triggerFileUpload}
+                        disabled={uploadedFiles.length >= MAX_FILES}
+                      >
+                        <FileImage className="mr-2 h-4 w-4 text-journal" />
                         <span>Upload Image</span>
                       </Button>
                     </div>
@@ -149,7 +252,7 @@ const ReportAnalysisPage = () => {
                   
                   <Button 
                     onClick={handleAnalyze} 
-                    disabled={!file || isAnalyzing}
+                    disabled={uploadedFiles.length === 0 || isAnalyzing}
                     className="w-full mt-4"
                   >
                     {isAnalyzing ? "Analyzing..." : "Analyze Report"}
