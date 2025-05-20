@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle, Send, Bot, User, Upload, FileImage, FilePdf } from "lucide-react";
+import { MessageCircle, Send, Bot, User, Upload, FileImage, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
@@ -134,7 +134,7 @@ const ChatPage = () => {
                     
                     <div className="flex flex-col space-y-2">
                       <Button variant="outline" className="justify-start" size="sm">
-                        <FilePdf className="mr-2 h-4 w-4 text-report" />
+                        <FileText className="mr-2 h-4 w-4 text-report" />
                         <span>Upload PDF</span>
                       </Button>
                       <Button variant="outline" className="justify-start" size="sm">
