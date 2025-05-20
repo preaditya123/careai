@@ -7,13 +7,13 @@ import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background hidden lg:block">
       <Header />
       <main className="container mx-auto py-12 px-4">
         {/* Hero Section with Left-Right Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <div className="grid grid-cols-12 gap-8 mb-16">
           {/* Left Side: Title and CTA */}
-          <div className="flex flex-col justify-center">
+          <div className="col-span-7 flex flex-col justify-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-left text-foreground">
               Your Complete <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Healthcare AI</span> Companion
             </h1>
@@ -32,9 +32,9 @@ const Index = () => {
           </div>
           
           {/* Right Side: Services */}
-          <div className="flex flex-col justify-center">
+          <div className="col-span-5 flex flex-col justify-center">
             <h2 className="text-2xl font-bold mb-6">Our Services</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-3">
               <ServiceItem 
                 icon={<MessageCircle className="w-5 h-5 text-chat" />} 
                 title="Chat with Care AI" 
@@ -65,7 +65,7 @@ const Index = () => {
         </div>
         
         {/* Feature Cards Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
+        <div className="grid grid-cols-3 gap-8 mt-6">
           {/* Chat with Care AI */}
           <FeatureCard
             title="Chat with Care AI"
@@ -118,7 +118,7 @@ const Index = () => {
 
 // Simple component for service items in the hero section
 const ServiceItem = ({ icon, title, to }: { icon: React.ReactNode; title: string; to: string }) => (
-  <Link to={to} className="flex items-center p-3 rounded-lg hover:bg-accent transition-colors group">
+  <Link to={to} className="flex items-center p-3 rounded-lg hover:bg-accent transition-colors group border border-border/30 hover:border-primary/30">
     <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 mr-3">
       {icon}
     </div>

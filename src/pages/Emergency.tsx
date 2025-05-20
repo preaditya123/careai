@@ -3,7 +3,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import { Ambulance, MapPin, Phone, Building2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
@@ -77,10 +77,10 @@ const EmergencyPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background hidden lg:block">
       <Header />
       <div className="page-container py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           <div className="flex items-center justify-center gap-3 mb-8">
             <Ambulance className="text-emergency h-8 w-8" />
             <h1 className="page-header mb-0">Emergency Assistant</h1>
@@ -106,8 +106,8 @@ const EmergencyPage = () => {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="border-border/50 md:col-span-1">
+          <div className="grid grid-cols-12 gap-6">
+            <Card className="border-border/50 col-span-3">
               <CardHeader>
                 <CardTitle className="text-xl">Find Nearby Hospitals</CardTitle>
               </CardHeader>
@@ -135,7 +135,7 @@ const EmergencyPage = () => {
               </CardContent>
             </Card>
             
-            <Card className="border-border/50 md:col-span-2">
+            <Card className="border-border/50 col-span-9">
               <CardHeader>
                 <CardTitle className="text-xl">Nearby Hospitals</CardTitle>
               </CardHeader>
