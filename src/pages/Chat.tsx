@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Send, Bot, User, Upload, FileImage, FileText, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Message {
   role: "user" | "assistant";
@@ -296,10 +297,10 @@ const ChatPage = () => {
                       <div className="flex justify-start">
                         <div className="bg-muted rounded-lg p-3 flex items-center space-x-2">
                           <Bot size={18} />
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 rounded-full bg-foreground/60 animate-pulse"></div>
-                            <div className="w-2 h-2 rounded-full bg-foreground/60 animate-pulse delay-150"></div>
-                            <div className="w-2 h-2 rounded-full bg-foreground/60 animate-pulse delay-300"></div>
+                          <div className="flex items-center space-x-1 ml-2">
+                            <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce"></div>
+                            <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                            <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.4s" }}></div>
                           </div>
                         </div>
                       </div>
