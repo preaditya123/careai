@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Send, Bot, User } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Message {
   role: "user" | "assistant";
@@ -53,79 +54,77 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background hidden lg:block">
+    <div className="min-h-screen bg-background">
       <Header />
-      <div className="page-container py-8">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <MessageCircle className="text-chat h-8 w-8" />
-            <h1 className="page-header mb-0">Chat with Care AI</h1>
-          </div>
-          
-          <div className="mx-auto max-w-3xl">
-            <Card className="border-border/50">
-              <CardContent className="p-4 flex flex-col" style={{ height: "70vh" }}>
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                  {messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${
-                        message.role === "assistant" ? "justify-start" : "justify-end"
-                      }`}
-                    >
-                      <div
-                        className={`flex max-w-[80%] ${
-                          message.role === "assistant"
-                            ? "bg-muted rounded-tr-lg rounded-br-lg rounded-bl-lg"
-                            : "bg-primary rounded-tl-lg rounded-tr-lg rounded-bl-lg"
-                        } p-3`}
-                      >
-                        <div className="flex gap-3">
-                          <div className="flex-shrink-0 mt-1">
-                            {message.role === "assistant" ? (
-                              <Bot size={18} />
-                            ) : (
-                              <User size={18} />
-                            )}
-                          </div>
-                          <span className="text-sm">{message.content}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg p-3 flex items-center space-x-2">
-                        <Bot size={18} />
-                        <div className="flex items-center space-x-1 ml-2">
-                          <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce"></div>
-                          <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                          <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.4s" }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <form
-                  onSubmit={handleSendMessage}
-                  className="p-4 border-t border-border flex gap-2"
-                >
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type your health question..."
-                    className="flex-1"
-                    disabled={isLoading}
-                  />
-                  <Button type="submit" disabled={isLoading || !input.trim()}>
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
+      <div className="container mx-auto px-4 py-6 flex flex-col" style={{ height: "calc(100vh - 64px)" }}>
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <MessageCircle className="text-chat h-8 w-8" />
+          <h1 className="page-header mb-0">Chat with Care AI</h1>
         </div>
+        
+        <Card className="flex-1 border-border/50 flex flex-col">
+          <CardContent className="p-4 flex flex-col h-full">
+            <ScrollArea className="flex-1 pr-4">
+              <div className="space-y-4 py-4">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex ${
+                      message.role === "assistant" ? "justify-start" : "justify-end"
+                    }`}
+                  >
+                    <div
+                      className={`flex max-w-[80%] ${
+                        message.role === "assistant"
+                          ? "bg-muted rounded-tr-lg rounded-br-lg rounded-bl-lg"
+                          : "bg-primary rounded-tl-lg rounded-tr-lg rounded-bl-lg"
+                      } p-3`}
+                    >
+                      <div className="flex gap-3">
+                        <div className="flex-shrink-0 mt-1">
+                          {message.role === "assistant" ? (
+                            <Bot size={18} />
+                          ) : (
+                            <User size={18} />
+                          )}
+                        </div>
+                        <span className="text-sm">{message.content}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-muted rounded-lg p-3 flex items-center space-x-2">
+                      <Bot size={18} />
+                      <div className="flex items-center space-x-1 ml-2">
+                        <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce"></div>
+                        <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                        <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.4s" }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+            
+            <form
+              onSubmit={handleSendMessage}
+              className="mt-4 border-t border-border pt-4 flex gap-2"
+            >
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your health question..."
+                className="flex-1"
+                disabled={isLoading}
+              />
+              <Button type="submit" disabled={isLoading || !input.trim()}>
+                <Send className="w-4 h-4" />
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
