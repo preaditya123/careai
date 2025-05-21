@@ -7,6 +7,10 @@ import { MessageCircle, Send, Bot, User } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import ChatMessage from "@/components/chat/ChatMessage";
+import TypingIndicator from "@/components/chat/TypingIndicator";
+import ChatHeader from "@/components/chat/ChatHeader";
+import ChatInput from "@/components/chat/ChatInput";
 
 interface Message {
   role: "user" | "assistant";
@@ -23,12 +27,11 @@ const ChatPage = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const handleSendMessage = (message: string) => {
+    if (!message.trim()) return;
 
     // Add user message
-    const userMessage = { role: "user" as const, content: input };
+    const userMessage = { role: "user" as const, content: message };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -57,89 +60,23 @@ const ChatPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="flex flex-col h-[calc(100vh-64px)] max-w-6xl mx-auto px-4 py-6">
-        <div className="flex items-center mb-6">
-          <div className="bg-primary/10 p-2.5 rounded-full mr-3">
-            <MessageCircle className="text-primary h-6 w-6" />
-          </div>
-          <h1 className="text-2xl font-semibold text-foreground">Care AI Assistant</h1>
-        </div>
+      <div className="chat-container">
+        <ChatHeader />
         
-        <Card className="flex-1 border-border/30 shadow-sm bg-card/50 backdrop-blur-sm flex flex-col overflow-hidden">
-          <CardContent className="flex flex-col h-full p-0">
-            <ScrollArea className="flex-1 p-6">
-              <div className="space-y-6">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "flex items-start",
-                      message.role === "assistant" ? "justify-start" : "justify-end"
-                    )}
-                  >
-                    {message.role === "assistant" && (
-                      <div className="bg-primary/10 p-1.5 rounded-full mr-3 flex-shrink-0">
-                        <Bot className="h-5 w-5 text-primary" />
-                      </div>
-                    )}
-                    <div
-                      className={cn(
-                        "max-w-[80%] px-4 py-3 rounded-2xl",
-                        message.role === "assistant"
-                          ? "bg-muted text-foreground"
-                          : "bg-primary text-primary-foreground"
-                      )}
-                    >
-                      <p className="text-sm leading-relaxed">{message.content}</p>
-                    </div>
-                    {message.role === "user" && (
-                      <div className="bg-primary p-1.5 rounded-full ml-3 flex-shrink-0">
-                        <User className="h-5 w-5 text-primary-foreground" />
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex items-start">
-                    <div className="bg-primary/10 p-1.5 rounded-full mr-3 flex-shrink-0">
-                      <Bot className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="bg-muted px-4 py-3 rounded-2xl">
-                      <div className="flex items-center space-x-1">
-                        <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce"></div>
-                        <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.2s" }}></div>
-                        <div className="w-2 h-2 rounded-full bg-foreground/60 animate-bounce" style={{ animationDelay: "0.4s" }}></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-            
-            <div className="border-t border-border/30 p-4 bg-background/50 backdrop-blur-sm">
-              <form
-                onSubmit={handleSendMessage}
-                className="flex gap-2 items-center"
-              >
-                <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your health question..."
-                  className="flex-1 bg-card border-border/50 focus-visible:ring-primary/30"
-                  disabled={isLoading}
-                />
-                <Button 
-                  type="submit" 
-                  size="icon" 
-                  disabled={isLoading || !input.trim()}
-                  className="rounded-full w-10 h-10 flex-shrink-0 shadow-sm"
-                >
-                  <Send className="w-4 h-4" />
-                </Button>
-              </form>
-            </div>
-          </CardContent>
-        </Card>
+        <ScrollArea className="chat-messages">
+          {messages.map((message, index) => (
+            <ChatMessage key={index} message={message} />
+          ))}
+          
+          {isLoading && <TypingIndicator />}
+        </ScrollArea>
+        
+        <ChatInput 
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onSend={() => handleSendMessage(input)}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   );
